@@ -1,0 +1,6 @@
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) openblas/threaded-0.3.20
+
+/mnt/sw/nix/store/ffi6v4jibbwfra0zjbplhmxnkxazqbpq-python-3.8.12-view/lib/python3.8/site-packages/numpy/lib/npyio.py:528: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+  arr = np.asanyarray(arr)
