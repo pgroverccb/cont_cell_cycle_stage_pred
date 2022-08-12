@@ -1,4 +1,4 @@
-## Predicting Continous Cell Cycle Stage from Raw Images
+## Predicting Continuous Cell Cycle Stage from Raw Images
 
 ### To construct GT Dataset : 
 
