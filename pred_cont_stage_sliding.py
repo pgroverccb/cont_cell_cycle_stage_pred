@@ -16,7 +16,7 @@ for i in range(130, 133):
 
 stage_pred_model = UNet3D(in_channel = 2, out_channel = 2, is_isotropic = True)
 # stage_pred_model = stage_pred_model.cuda()
-stage_pred_model.load_state_dict(torch.load("/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/saved_model.pth", map_location=torch.device('cpu')))
+stage_pred_model.load_state_dict(torch.load("/mnt/ceph/users/pgrover/saved_model_12.pth", map_location=torch.device('cpu')))
  
 print("Begin Testing.")
 for ID in testing_partition:
@@ -30,8 +30,14 @@ for ID in testing_partition:
     output_pred = stage_pred_model(input)
     np.save("/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/testing_pred_" + str(ID) + ".npy", output_pred.detach().cpu().numpy())
 
+
 for index in testing_partition:
-    output_pred = np.load("/mnt/home/pgrover/cont_cell_cycle_stage_pred/utils/testing_pred_" + str(index) + ".npy")
+    print("Index : ", index)
+    output_pred = np.load("/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/testing_pred_" + str(index) + ".npy")
+    file = open("/mnt/ceph/users/pgrover/growth_field_dataset/sample_" + str(ID) + ".pkl", 'rb')
+    sample_full = pickle.load(file)
+    output = torch.Tensor(sample_full['output'].reshape((1, sample_full['output'].shape[0], sample_full['output'].shape[1], sample_full['output'].shape[2], sample_full['output'].shape[3])))    
+    output = output[:, :, 13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
     five_digit_str = str(index)
     while (len(five_digit_str) != 5):
         five_digit_str = '0' + five_digit_str
@@ -47,15 +53,37 @@ for index in testing_partition:
         curr_volume[curr_volume != curr_index] = 0
         curr_volume[curr_volume == curr_index] = 1
         all_pixels = len(np.argwhere(curr_volume) == 1)
+        curr_volume = curr_volume * output_pred[0, 0]
+        growth_avg = np.sum(curr_volume)/all_pixels
+        print("Growth Stage Prediction in Pre frame for Index :", curr_index, "is :", growth_avg)
+        # print(" ")
+        curr_volume = np.copy(mask_pre)[13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
+        curr_volume[curr_volume != curr_index] = 0
+        curr_volume[curr_volume == curr_index] = 1
+        all_pixels = len(np.argwhere(curr_volume) == 1)
         curr_volume = curr_volume * output[0, 0].detach().numpy()
         growth_avg = np.sum(curr_volume)/all_pixels
-        print("Growth Stage in Pre frame for Index :", curr_index, "is :", growth_avg)
-    
+        print("Growth Stage Actual in Pre frame for Index :", curr_index, "is :", growth_avg)
+        print(" ")
+    print(" ")
+    print(" ")
+
     for curr_index in np.unique(mask_post)[1: ]:
+        curr_volume = np.copy(mask_post)[13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
+        curr_volume[curr_volume != curr_index] = 0
+        curr_volume[curr_volume == curr_index] = 1
+        all_pixels = len(np.argwhere(curr_volume) == 1)
+        curr_volume = curr_volume * output_pred[0, 1]
+        growth_avg = np.sum(curr_volume)/all_pixels
+        print("Growth Stage Prediction in Post frame for Index :", curr_index, "is :", growth_avg)
+        # print(" ")
         curr_volume = np.copy(mask_post)[13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
         curr_volume[curr_volume != curr_index] = 0
         curr_volume[curr_volume == curr_index] = 1
         all_pixels = len(np.argwhere(curr_volume) == 1)
         curr_volume = curr_volume * output[0, 1].detach().numpy()
         growth_avg = np.sum(curr_volume)/all_pixels
-        print("Growth Stage in Post frame for Index :", curr_index, "is :", growth_avg)
+        print("Growth Stage Actual in Post frame for Index :", curr_index, "is :", growth_avg)
+        print(" ")
+    print(" ")
+    print(" ")
