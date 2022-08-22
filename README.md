@@ -1,5 +1,8 @@
 ## Predicting Continuous Cell Cycle Stage from Raw Images
 
+### Running Saved Model on External Images
+
+---
 ### To construct GT Dataset : 
 
 Using Lineage Trees and Segmentation Masks, it is possible to obtain how close each nuclei in a sample volume is to its division.
