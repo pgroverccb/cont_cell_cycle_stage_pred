@@ -3,7 +3,10 @@
 ### Running Saved Model on External Images
 
 ---
-### To construct GT Dataset : 
+
+### Methodology
+
+#### To construct GT Dataset : 
 
 Using Lineage Trees and Segmentation Masks, it is possible to obtain how close each nuclei in a sample volume is to its division.
 
@@ -44,7 +47,7 @@ In a sequence of 60 frames, timestep 35 contains two nuclei x (formed at 22 and 
 Run on cluster with scripts/script_form_dataset.slurm, expected output for F32_40 Sequence : logs/log_form_dataset.1542472.out, dataset is saved in the form of two-frame raw image input and corresponding stage maps as output.
 ~~~~
 
-### To train and test network : 
+#### To train and test network : 
 
 3D U-Net is used to generate a two-frame map of stage of growth of nuclei, and their proximity to division. Architecture of U-Net is adopted from PyTorch Connectomics Library.
 
