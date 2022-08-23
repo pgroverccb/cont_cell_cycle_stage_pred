@@ -2,7 +2,7 @@
 
 ### Running Saved Model on External Raw Images
 
-The model is part of a bigger end-to-end system for segmentation and tracking, and thus requires instance segmentation masks as input, where background is labelled as 0, and foreground instances are labelled [1, 2, 3 ... ]. For demonstration, U3D-BCD network can be used for this purpose. Additional MONAI library is utilized for sliding window approach (available [here](https://drive.google.com/drive/u/0/folders/1A_q8lcUjO-rUbi0iwppIXCzHofhdZOFX)). Saved model is placed in utils/u3d_bcd_saved_model.pth.
+The model is part of a bigger end-to-end system for segmentation and tracking, and thus requires instance segmentation masks as input, where background is labelled as 0, and foreground instances are labelled [1, 2, 3 ... ]. For demonstration, U3D-BCD network can be used for this purpose. Additional MONAI library is utilized for sliding window approach (available [here](https://drive.google.com/drive/u/0/folders/1A_q8lcUjO-rUbi0iwppIXCzHofhdZOFX)). Saved model is placed in _utils/u3d_bcd_saved_model.pth_
 
 * **pred_inst_u3d_bcd.py** -  _generates instance segmentation masks from a raw unannotated image._ 
 
