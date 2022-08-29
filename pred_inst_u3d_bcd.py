@@ -22,17 +22,18 @@ from monai.data import (
 )
 import os
 import pickle
+import tifffile
 
 dataset_path = "sample_dataset/"
-test_set_paths_pairs = [['1.npy', '2.npy']
+test_set_paths_pairs = [['image_reg_00135.tif', 'image_reg_00136.tif']]
 saved_weights_path = "utils/u3d_bcd_saved_model.pth"
 patch_size = (16, 128, 128)
                         
 test_files = []
 
 for pair in test_set_paths_pairs:
-      input_volume_1 = np.load(pair[0])
-      input_volume_2 = np.load(pair[1])
+      input_volume_1 = tifffile.imread(dataset_path + pair[0])
+      input_volume_2 = tifffile.imread(dataset_path + pair[1])
 
       orig_shape = input_volume_1.shape
       input_volume_1 = (input_volume_1 - np.mean(input_volume_1))/(np.std(input_volume_1))
@@ -41,14 +42,14 @@ for pair in test_set_paths_pairs:
       input_volume_1 = scaler.transform(input_volume_1.flatten().reshape(-1, 1)).reshape(orig_shape)
 
       orig_shape = input_volume_2.shape
-      input_volume_2 = (input_volume_2 - np.mean(input_volume_2)/(np.std(input_volume_2))
+      input_volume_2 = (input_volume_2 - np.mean(input_volume_2))/(np.std(input_volume_2))
       scaler = MinMaxScaler()
       scaler.fit(input_volume_2.flatten().reshape(-1, 1))
       input_volume_2 = scaler.transform(input_volume_2.flatten().reshape(-1, 1)).reshape(orig_shape)
 
-      image_path = inference_path + "image"
+      image_path = dataset_path + "normalized_image.npy"
       test_files.append({'image' : image_path})
-      np.save(image_path, np.array(input_volume_1, input_volume_2))
+      np.save(image_path, np.array([input_volume_1, input_volume_2]))
       print("Completed operation for ", pair)
 
 test_files = np.array(test_files)
@@ -151,10 +152,24 @@ def bcd_watershed(semantic, boundary, distance, thres1=0.9, thres2=0.8, thres3=0
 
 with torch.no_grad():
     for step, batch in enumerate(test_iterator):
-        val_inputs = batch["image"]
-        val_outputs = sliding_window_inference(val_inputs[:, :, :, :, :], patch_size, 4, model)
-        np.save("predicted_stage_map_" + str(step) + ".npy", val_outputs[0])
-        out = bcd_watershed(val_outputs[0, 0], val_outputs[0, 1], val_outputs[0, 2], thres1 = 20, thres2 = -40, thres3 = -10, thres4 = -15, thres5 = -0.3, thres_small = 256, seed_thres = 64)
-        np.save(inference_path + "predicted_seg_mask_" + current_label + ".npy", out)
-        print("Found", np.unique(out), "unique objects.")
+        val_inputs = batch["image"].cuda()
+        # print("Shape of val_inputs : ", val_inputs.shape)
+        val_outputs = []
         
+        val_outputs_1 = sliding_window_inference(val_inputs[:, :, 0], patch_size, 4, model)
+        val_outputs_2 = sliding_window_inference(val_inputs[:, :, 1], patch_size, 4, model)
+
+        # print("Shape of val_outputs_1 : ", val_outputs_1.shape)
+        # print("Shape of val_outputs_2 : ", val_outputs_2.shape)
+
+        val_outputs = np.array([val_outputs_1[0].detach().cpu().numpy(), val_outputs_2[0].detach().cpu().numpy()])
+
+        np.save("utils/predicted_stage_map.npy", val_outputs)
+
+        out_1 = bcd_watershed(val_outputs_1[0, 0].detach().cpu().numpy(), val_outputs_1[0, 1].detach().cpu().numpy(), val_outputs_1[0, 2].detach().cpu().numpy(), thres1 = 20, thres2 = -40, thres3 = -10, thres4 = -15, thres5 = -0.3, thres_small = 256, seed_thres = 64)
+        out_2 = bcd_watershed(val_outputs_2[0, 0].detach().cpu().numpy(), val_outputs_2[0, 1].detach().cpu().numpy(), val_outputs_2[0, 2].detach().cpu().numpy(), thres1 = 20, thres2 = -40, thres3 = -10, thres4 = -15, thres5 = -0.3, thres_small = 256, seed_thres = 64)
+        out = np.array([out_1, out_2])
+
+        np.save("utils/predicted_seg_mask.npy", out)
+        print("Found", np.unique(out_1), "unique objects in pre frame.")
+        print("Found", np.unique(out_2), "unique objects in post frame.")
