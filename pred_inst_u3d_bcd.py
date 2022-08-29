@@ -25,7 +25,7 @@ import pickle
 
 dataset_path = "sample_dataset/"
 test_set_paths_pairs = [['1.npy', '2.npy']
-saved_weights_path = "utils/cell_cycle_saved_model.pth"
+saved_weights_path = "utils/u3d_bcd_saved_model.pth"
 patch_size = (16, 128, 128)
                         
 test_files = []
