@@ -55,8 +55,6 @@ for i in range(50, 130):
         partition['train'].append(i)
 
 # Generators
-partition['train'] = [125]
-partition['validation'] = [126]
 training_set = Dataset(partition['train'])
 training_generator = torch.utils.data.DataLoader(training_set, **params)
 
