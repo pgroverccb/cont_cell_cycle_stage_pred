@@ -82,7 +82,7 @@ for e in range(1, 200+1):
         y_train_pred = stage_pred_model(X_train_batch)
         l2_growth_pre = mse_loss(y_train_pred[0, 0, :, :, :], y_train_batch[0, 0, :, :, :])
         l2_growth_post = mse_loss(y_train_pred[0, 1, :, :, :], y_train_batch[0, 1, :, :, :])
-        print("T : L2 Growth Pre : " + str(round(l2_growth_pre.item(), 3)) + "| L2 Growth Post : " + str(round(l2_growth_post.item(), 3)))
+        # print("T : L2 Growth Pre : " + str(round(l2_growth_pre.item(), 3)) + "| L2 Growth Post : " + str(round(l2_growth_post.item(), 3)))
         train_loss = (l2_growth_pre + l2_growth_post)
         train_loss_avg += train_loss.item()
         train_loss.backward()
@@ -95,18 +95,18 @@ for e in range(1, 200+1):
         y_val_pred = stage_pred_model(X_val_batch)
         l2_growth_pre = mse_loss(y_val_pred[0, 0, :, :, :], y_val_batch[0, 0, :, :, :])
         l2_growth_post = mse_loss(y_val_pred[0, 1, :, :, :], y_val_batch[0, 1, :, :, :])
-        print("V : L2 Growth Pre : " + str(round(l2_growth_pre.item(), 3)) + "| L2 Growth Post : " + str(round(l2_growth_post.item(), 3)))
+        # print("V : L2 Growth Pre : " + str(round(l2_growth_pre.item(), 3)) + "| L2 Growth Post : " + str(round(l2_growth_post.item(), 3)))
         val_loss = (l2_growth_pre + l2_growth_post)
         val_loss_avg += val_loss.item()
         optimizer.step()
-    print("Epoch : " + str(e) + "Train Loss : " + str(round(train_loss_avg/len(partition['train']), 3)) + "Val Loss : " + str(round(val_loss_avg/len(partition['validation']), 3)))
+    print("Epoch : " + str(e) + " Train Loss : " + str(round(train_loss_avg/len(partition['train']), 3)) + " Val Loss : " + str(round(val_loss_avg/len(partition['validation']), 3)))
     torch.save(stage_pred_model.state_dict(), "/mnt/ceph/users/pgrover/saved_model_" + str(e) + ".pth")
 
     testing_partition = []
     for i in range(130, 131):
         testing_partition.append(i)
 
-    print("Begin Testing.")
+    print("Randomized Inference Testing.")
     for ID in testing_partition[:1]:
         file = open("/mnt/ceph/users/pgrover/growth_field_dataset/sample_" + str(ID) + ".pkl", 'rb')
         sample_full = pickle.load(file)
@@ -120,7 +120,7 @@ for e in range(1, 200+1):
 
 
     for index in testing_partition[:1]:
-        print("Index : " + str(index))
+        # print("Index : " + str(index))
         # output_pred = np.load("/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/testing_pred_" + str(index) + ".npy")
         file = open("/mnt/ceph/users/pgrover/growth_field_dataset/sample_" + str(ID) + ".pkl", 'rb')
         sample_full = pickle.load(file)
@@ -136,7 +136,15 @@ for e in range(1, 200+1):
             five_digit_str = '0' + five_digit_str
         mask_post = tifffile.imread("/mnt/ceph/users/pgrover/32_40_dataset/registered_label_images/label_reg_" + str(five_digit_str) + ".tif")
 
-        for curr_index in np.unique(mask_pre)[1:]:
+        indexes_for_pre = []
+        for i in range(3):
+            indexes_for_pre.append((int(random.random() * 40)))
+
+        indexes_for_post = []
+        for i in range(3):
+            indexes_for_post.append((int(random.random() * 40)))
+
+        for curr_index in indexes_for_pre:
             curr_volume = np.copy(mask_pre)[13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
             curr_volume[curr_volume != curr_index] = 0
             curr_volume[curr_volume == curr_index] = 1
@@ -153,14 +161,10 @@ for e in range(1, 200+1):
             all_pixels = len(np.argwhere(curr_volume) == 1)
             curr_volume = curr_volume * output[0, 0].detach().numpy()
             growth_avg = np.sum(curr_volume) * 1.0 / all_pixels
-            growth_avg = min(1.0, growth_avg)
-            growth_avg = max(0.0, growth_avg)
             print("Growth stage actual in pre frame for " + str(curr_index) + " is : " + str(round(growth_avg, 3)))
-            print(" ")
         print(" ")
         print(" ")
-
-        for curr_index in np.unique(mask_post)[1 : ]:
+        for curr_index in indexes_for_post:
             curr_volume = np.copy(mask_post)[13 : 13 + 128, 64 : 64 + 128, 96 : 96 + 128]
             curr_volume[curr_volume != curr_index] = 0
             curr_volume[curr_volume == curr_index] = 1
@@ -177,9 +181,5 @@ for e in range(1, 200+1):
             all_pixels = len(np.argwhere(curr_volume) == 1)
             curr_volume = curr_volume * output[0, 1].detach().numpy()
             growth_avg = np.sum(curr_volume) * 1.0 / all_pixels
-            growth_avg = min(1.0, growth_avg)
-            growth_avg = max(0.0, growth_avg)
             print("Growth stage actual in post frame for " + str(curr_index) + "is :" + str(round(growth_avg, 3)))
-            print(" ")
-        print(" ")
         print(" ")
