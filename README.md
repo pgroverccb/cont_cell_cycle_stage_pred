@@ -61,4 +61,4 @@ Supporting data including PyTorch Connectomics Framework (relevant files) and Sa
 
 * **run_cont_stage.py** - _is the script used for training and validating the network, randomized crop to 32 x 128 x 128 is used for each volume._
 
-* **pred_cont_stage_sliding.py** - _uses a sliding window apporach predict stage maps for arbitrary sized volumes, coupled with segmentation masks, provides stage of growth for each instance present, and displays accuracy of model._
+* **pred_cont_stage_sliding.py** - _predicts stage maps for 32 x 128 x 128, coupled with segmentation masks, provides stage of growth for each instance present, and displays accuracy of model._
