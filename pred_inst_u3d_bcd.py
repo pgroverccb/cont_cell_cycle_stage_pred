@@ -21,31 +21,35 @@ from monai.data import (
     CacheDataset,
 )
 import os
+import pickle
 
-inference_path = "pred_masks"
-test_set_labels = ['F55_185']
-saved_weights_path = "utils/u3d_bcd_saved_model.pth"
+dataset_path = "sample_dataset/"
+test_set_paths_pairs = [['1.npy', '2.npy']
+saved_weights_path = "utils/cell_cycle_saved_model.pth"
 patch_size = (16, 128, 128)
-
-if not os.path.isdir(inference_path):
-      os.makedirs(inference_path)
-      print("Created Inference Folder", inference_path)
-else:
-      print("Folder already exists")
-
+                        
 test_files = []
 
-for series in test_set_labels:
-      input_volume = np.load("/content/drive/MyDrive/TestingSet_2022/" + series + "/" + series + "/images/" + series + "_image_0001.npy")
-      orig_shape = input_volume.shape
-      input_volume = (input_volume - np.mean(input_volume))/(np.std(input_volume))
+for pair in test_set_paths_pairs:
+      input_volume_1 = np.load(pair[0])
+      input_volume_2 = np.load(pair[1])
+
+      orig_shape = input_volume_1.shape
+      input_volume_1 = (input_volume_1 - np.mean(input_volume_1))/(np.std(input_volume_1))
       scaler = MinMaxScaler()
-      scaler.fit(input_volume.flatten().reshape(-1, 1))
-      input_volume = scaler.transform(input_volume.flatten().reshape(-1, 1)).reshape(orig_shape)
-      image_path = inference_path + "image_" + series + ".npy"
+      scaler.fit(input_volume_1.flatten().reshape(-1, 1))
+      input_volume_1 = scaler.transform(input_volume_1.flatten().reshape(-1, 1)).reshape(orig_shape)
+
+      orig_shape = input_volume_2.shape
+      input_volume_2 = (input_volume_2 - np.mean(input_volume_2)/(np.std(input_volume_2))
+      scaler = MinMaxScaler()
+      scaler.fit(input_volume_2.flatten().reshape(-1, 1))
+      input_volume_2 = scaler.transform(input_volume_2.flatten().reshape(-1, 1)).reshape(orig_shape)
+
+      image_path = inference_path + "image"
       test_files.append({'image' : image_path})
-      np.save(image_path, input_volume)
-      print("Completed operation for ", series)
+      np.save(image_path, np.array(input_volume_1, input_volume_2))
+      print("Completed operation for ", pair)
 
 test_files = np.array(test_files)
 test_transforms = Compose(
@@ -68,8 +72,8 @@ test_loader = DataLoader(
 
 test_iterator = tqdm(test_loader, desc="Testing (X / X Steps) (dice=X.X)", dynamic_ncols=True)
 model = UNet3D()
-model.load_state_dict(torch.load(saved_weights_path, map_location=torch.device('cpu')))
-# model = model.cuda()
+model.load_state_dict(torch.load(saved_weights_path))
+model = model.cuda()
 model.eval()
 
 def getSegType(mid):
@@ -147,11 +151,10 @@ def bcd_watershed(semantic, boundary, distance, thres1=0.9, thres2=0.8, thres3=0
 
 with torch.no_grad():
     for step, batch in enumerate(test_iterator):
-        current_label = test_set_labels[step]
-        print(" ")
-        print("Processing : ", current_label)
         val_inputs = batch["image"]
         val_outputs = sliding_window_inference(val_inputs[:, :, :, :, :], patch_size, 4, model)
-        np.save(inference_path + "unet_outputs_" + current_label + ".npy", val_outputs)
+        np.save("predicted_stage_map_" + str(step) + ".npy", val_outputs[0])
         out = bcd_watershed(val_outputs[0, 0], val_outputs[0, 1], val_outputs[0, 2], thres1 = 20, thres2 = -40, thres3 = -10, thres4 = -15, thres5 = -0.3, thres_small = 256, seed_thres = 64)
         np.save(inference_path + "predicted_seg_mask_" + current_label + ".npy", out)
+        print("Found", np.unique(out), "unique objects.")
+        
