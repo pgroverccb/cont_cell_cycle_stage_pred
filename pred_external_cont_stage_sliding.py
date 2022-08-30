@@ -74,34 +74,39 @@ test_loader = DataLoader(
 )
 
 test_iterator = tqdm(test_loader, desc="Testing (X / X Steps) (dice=X.X)", dynamic_ncols=True)
-stage_pred_model = UNet3D(in_channel = 2, out_channel = 2, is_isotropic = True)
+stage_pred_model = UNet3D(in_channel = 2, out_channel = 2, is_isotropic = False)
 stage_pred_model = stage_pred_model.cuda()
 stage_pred_model.load_state_dict(torch.load(saved_weights_path))
- 
+
+def sigmoid(x):
+  return 1 / (1 + np.exp(-x))
+
 print("Begin Testing.")
 with torch.no_grad():
     for step, batch in enumerate(test_iterator):
         val_inputs = batch["image"].cuda()
-#         print("val_inputs shape : ", val_inputs.shape)
+        print("val_inputs shape : ", val_inputs.shape)
         val_outputs = sliding_window_inference(val_inputs[:, 0], patch_size, 4, stage_pred_model)
-#         print("val_outputs shape : ", val_outputs.shape)
+        print("val_outputs shape : ", val_outputs.shape)
         np.save("predicted_stage_map_" + str(step) + ".npy", val_outputs[0])
         
         mask_pre = np.load("utils/predicted_seg_mask.npy")[0]
         mask_post = np.load("utils/predicted_seg_mask.npy")[1]
 
         for curr_index in np.unique(mask_pre)[1: ]:
+                curr_volume = np.copy(mask_pre)
                 curr_volume[curr_volume != curr_index] = 0
                 curr_volume[curr_volume == curr_index] = 1
                 all_pixels = len(np.argwhere(curr_volume) == 1)
-                curr_volume = curr_volume * val_outputs[0, 0]
-                growth_avg = np.sum(curr_volume)/all_pixels
+                curr_volume = curr_volume * sigmoid(val_outputs[0, 0])
+                growth_avg = np.sum(curr_volume) * 1.0 /all_pixels
                 print("Growth Stage Prediction in Pre frame for Index :", curr_index, "is :", growth_avg)
 
         for curr_index in np.unique(mask_post)[1: ]:
+                curr_volume = np.copy(mask_post)
                 curr_volume[curr_volume != curr_index] = 0
                 curr_volume[curr_volume == curr_index] = 1
                 all_pixels = len(np.argwhere(curr_volume) == 1)
-                curr_volume = curr_volume * val_outputs[0, 1]
-                growth_avg = np.sum(curr_volume)/all_pixels
+                curr_volume = curr_volume * sigmoid(val_outputs[0, 1])
+                growth_avg = np.sum(curr_volume) * 1.0/all_pixels
                 print("Growth Stage Prediction in Post frame for Index :", curr_index, "is :", growth_avg)
