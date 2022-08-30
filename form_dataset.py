@@ -4,7 +4,7 @@ import pickle
 
 x = np.load("/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/growth_stages.npy", allow_pickle=True)
 
-for index in range(50, 134):
+for index in range(50, 133):
     five_digit_str = str(index)
     while (len(five_digit_str) != 5):
         five_digit_str = '0' + five_digit_str
