@@ -3,10 +3,9 @@ import numpy as np
 import tifffile
 import pickle
 
-f = open("/mnt/home/pgrover/clean_graph.json", "r")
+f = open("/mnt/home/pgrover/CombinedGraph1_163.json", "r")
 text = f.read()
 text = json.loads(text)
-text = text['gg']
 
 new_text = ""
 upper_count = 1000
