@@ -3,13 +3,14 @@ import numpy as np
 import tifffile
 import pickle
 
-f = open("/mnt/ceph/users/pgrover/32_40_dataset/Lineages/GT_tracking_F32_to_F40.json", "r")
+f = open("/mnt/home/pgrover/clean_graph.json", "r")
 text = f.read()
 text = json.loads(text)
-text = text['G_based_on_nn']
+text = text['gg']
 
 new_text = ""
-for num in range(50, 135):
+upper_count = 1000
+for num in range(0, upper_count):
     count = 0
     for i in range(len(text['Edges'])):
         timestep_str = str(num)
@@ -27,13 +28,21 @@ for edge in edges_list[:-1]:
     updated_edges_list.append([from_point, to_point])
 updated_edges_list.sort()
 
+start_timestep = int(updated_edges_list[0][0].split("_")[0])
+end_timestep = int(updated_edges_list[-1][0].split("_")[0])
+
+num_nuclei_at_start = 0
+for edge in updated_edges_list:
+    if (int(edge[0].split("_")[0]) == start_timestep):
+        num_nuclei_at_start += 1
+
 centroids = {}
 pixels = {}
 mapping = {}
 
 def get_div_step(timestep_start, obj_id, chain_space):
     initial_obj_id = obj_id
-    for timestep in range(timestep_start, 135):
+    for timestep in range(timestep_start, end_timestep):
         if ((str(obj_id) + "_" + str(timestep_start)) not in centroids.keys()):
             centroids[str(obj_id) + "_" + str(timestep_start)] = []
             pixels[str(obj_id) + "_" + str(timestep_start)] = []
@@ -73,7 +82,6 @@ def get_div_step(timestep_start, obj_id, chain_space):
         obj_id = out_map_to[0]
     return 0
 
-
 chain_space = ""
 def recurs(step, id, chain_space):
     print(chain_space, "Timestep : ", step, "ID : ", id)
@@ -89,9 +97,9 @@ def recurs(step, id, chain_space):
     return recurs(timestep + 1, child_1_obj_id, chain_space), recurs(timestep + 1, child_2_obj_id, chain_space)
 
 isolated_divisions_list = []
-for id in range(1, 17):
+for id in range(1, num_nuclei_at_start + 1):
     print("Processing ID : ", id)
-    recurs(50, id, chain_space)
+    recurs(start_timestep, id, chain_space)
 
 curr_file = open('/mnt/home/pgrover/continous_cell_cycle_stage_pred/utils/mapping.pkl', 'wb')
 pickle.dump(mapping, curr_file)
