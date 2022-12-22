@@ -1,0 +1,126 @@
+dataset_sequences:    
+  - name : d22_220827_stack1
+    z_dim : 202
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 7
+    end_timestep : 109
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack1/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack1/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack1/registered_label_images/
+
+  - name : d22_210809_stack3
+    z_dim : 140
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 100
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/210809_stack3/Segmented_images/210809_stack3/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/210809_stack3/Segmented_images/210809_stack3/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/210809_stack3/Segmented_images/210809_stack3/registered_label_images/
+
+  - name : d22_220827_stack6
+    z_dim : 202
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 141
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack6/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack6/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack6/registered_label_images/
+  
+  - name : d22_220827_stack7
+    z_dim : 215
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 120
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack7/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack7/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack7/registered_label_images/
+  
+  - name : d22_220827_stack8
+    z_dim : 215
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 108
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack8/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack8/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack8/registered_label_images/
+  
+  - name : d22_220827_stack10
+    z_dim : 215
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 142
+    five_char_indexing : False
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack10/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack10/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Maddy/220827_stack10/registered_label_images/
+
+  - name : d22_220827_stack11
+    z_dim : 252
+    y_dim : 512
+    x_dim : 512
+    start_timestep : 1
+    end_timestep : 163
+    five_char_indexing : True
+    key_present : False
+    key_name : NULL
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/MouseData/Eszter/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/MouseData/Eszter/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/MouseData/Eszter/registered_label_images/
+
+  - name : d22_SeqF32_40masks
+    z_dim : 160
+    y_dim : 392
+    x_dim : 240
+    start_timestep : 50
+    end_timestep : 137
+    five_char_indexing : True
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF32_40masks/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF32_40masks/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF32_40masks/registered_label_images/
+  
+  - name : d22_SeqF41_50masks
+    z_dim : 160
+    y_dim : 392
+    x_dim : 240
+    start_timestep : 50
+    end_timestep : 148
+    five_char_indexing : True
+    key_present : True
+    key_name : G_based_on_nn
+    label_tag : label_reg8_
+    lineage_graph_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF41_50masks/LineageGraph.json
+    reg_images_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF41_50masks/registered_images/
+    reg_labels_path : /mnt/ceph/users/lbrown/Labels3DMouse/GTSets/FSequenceData/SeqF41_50masks/registered_label_images/
